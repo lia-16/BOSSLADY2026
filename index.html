@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>BOSS LADY — Planner</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180/2A2220/C9A84C?text=BOSS">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cream: #FAF7F2; --warm-white: #FFF9F4; --blush: #E8C4B8;
+            --rose: #C97B6B; --deep-rose: #9B4F41; --gold: #C9A84C;
+            --charcoal: #2A2220; --muted: #8A7A76; --border: #E0D5CF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            line-height: 1.5;
+            padding-bottom: 100px;
+        }
+
+        /* HEADER */
+        header {
+            background: var(--charcoal);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0; z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.1rem; }
+        .logo span { color: var(--blush); font-weight: 900; font-style: normal; }
+
+        /* NAV PÉRIODES */
+        .period-bar {
+            display: flex; overflow-x: auto; background: var(--warm-white);
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none;
+        }
+        .period-bar::-webkit-scrollbar { display: none; }
+        
+        .period-tab {
+            padding: 15px 20px; border: none; background: none;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            color: var(--muted); white-space: nowrap; cursor: pointer;
+        }
+        .period-tab.active { color: var(--deep-rose); border-bottom: 3px solid var(--rose); }
+
+        /* MAIN */
+        .main-content { max-width: 800px; margin: 0 auto; padding: 15px; }
+        
+        .date-nav { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin: 10px 0 20px; 
+        }
+        .current-label { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; text-align: center; }
+        .stats-sub { font-size: 0.75rem; color: var(--rose); display: block; font-weight: normal; }
+
+        /* CARDS */
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        .cat-card {
+            background: white; border-radius: 15px; border: 1px solid var(--border);
+            overflow: hidden; transition: transform 0.2s;
+        }
+
+        .cat-header { 
+            padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        /* OBJECTIFS */
+        .objective-item {
+            display: flex; align-items: center; padding: 12px 15px;
+            border-bottom: 1px solid var(--cream);
+            gap: 10px;
+        }
+        .obj-text { flex: 1; font-size: 0.95rem; outline: none; }
+        .obj-text.done { text-decoration: line-through; color: var(--muted); }
+
+        .btn-star { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 5px; }
+        .btn-del { background: none; border: none; color: #eee; cursor: pointer; font-size: 0.8rem; }
+        .cat-card:hover .btn-del { color: #ccc; }
+
+        .add-obj-input {
+            width: 100%; padding: 15px; border: none; background: var(--warm-white);
+            font-size: 0.9rem; border-top: 1px solid var(--border);
+            font-family: inherit;
+        }
+
+        /* FAB */
+        .fab {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--charcoal); color: white; border: none;
+            font-size: 28px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 90;
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: none; place-items: center; z-index: 1000; backdrop-filter: blur(3px);
+        }
+        .modal-overlay.open { display: grid; }
+        .modal { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 380px; }
+        .modal h3 { font-family: 'Playfair Display', serif; margin-bottom: 15px; }
+        
+        .btn-action { 
+            width: 100%; padding: 12px; background: var(--charcoal); color: white; 
+            border: none; border-radius: 8px; margin-top: 10px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <span id="displayUserName">BOSS</span>'s Planner ✦
+    </div>
+    <div style="display: flex; gap: 15px;">
+        <button onclick="exportData()" style="background:none; border:none; color:var(--gold); font-size: 0.7rem;">JSON</button>
+        <button onclick="openSettings()" style="background:none; border:none; color:white; font-size: 1.2rem;">⚙️</button>
+    </div>
+</header>
+
+<div class="period-bar" id="periodBar"></div>
+
+<div class="main-content">
+    <div class="date-nav">
+        <button onclick="navigate(-1)" style="background:none; border:none; font-size: 2rem; color:var(--muted)">‹</button>
+        <div class="current-label" id="currentLabel"></div>
+        <button onclick="navigate(1)" style="background:none; border:none; font-size: 2rem; color:var(--muted)">›</button>
+    </div>
+
+    <div class="categories-grid" id="categoriesGrid"></div>
+</div>
+
+<button class="fab" onclick="openCatModal()">+</button>
+
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <h3>Paramètres</h3>
+        <label style="font-size: 0.8rem; color: var(--muted);">Ton Nom :</label>
+        <input type="text" id="userNameInput" style="width:100%; padding:10px; margin: 10px 0 20px; border:1px solid var(--border); border-radius: 5px;">
+        <button onclick="saveSettings()" class="btn-action">Enregistrer</button>
+        <button onclick="resetPlanner()" class="btn-action" style="background:#e74c3c; margin-top: 30px;">Réinitialiser tout</button>
+        <button onclick="closeSettings()" class="btn-action" style="background:none; color:var(--muted);">Annuler</button>
+    </div>
+</div>
+
+<script>
+    // --- ÉTAT INITIAL ---
+    let state = JSON.parse(localStorage.getItem('bosslady_final')) || {
+        userName: "Lia",
+        currentPeriod: 'Quotidien',
+        currentDate: new Date().toISOString().split('T')[0],
+        categories: [
+            { id: '1', name: 'Travail', icon: '💼', color: '#C97B6B' },
+            { id: '2', name: 'Self-care', icon: '🌿', color: '#7BC9A8' }
+        ],
+        objectives: {},
+        recurring: {} // { catId: [texts] }
+    };
+
+    const save = () => localStorage.setItem('bosslady_final', JSON.stringify(state));
+
+    // --- LOGIQUE RÉCURRENCE ---
+    function applyRecurring() {
+        state.categories.forEach(cat => {
+            const key = `${state.currentPeriod}::${state.currentDate}::${cat.id}`;
+            const recList = state.recurring[cat.id] || [];
+            
+            if (!state.objectives[key]) state.objectives[key] = [];
+            
+            recList.forEach(text => {
+                const exists = state.objectives[key].some(o => o.text === text);
+                if (!exists) {
+                    state.objectives[key].push({ id: 'rec_'+Date.now()+Math.random(), text: text, done: false, isPermanent: true });
+                }
+            });
+        });
+    }
+
+    // --- RENDU ---
+    function render() {
+        save();
+        applyRecurring();
+        document.getElementById('displayUserName').textContent = state.userName.toUpperCase();
+        
+        // Périodes
+        const periods = ['Quotidien', 'Hebdomadaire', 'Mensuel'];
+        document.getElementById('periodBar').innerHTML = periods.map(p => `
+            <button class="period-tab ${state.currentPeriod === p ? 'active' : ''}" 
+                    onclick="state.currentPeriod='${p}'; render();">${p}</button>
+        `).join('');
+
+        // Date & Stats
+        const d = new Date(state.currentDate + "T00:00:00");
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        
+        let total = 0, done = 0;
+        state.categories.forEach(c => {
+            const k = `${state.currentPeriod}::${state.currentDate}::${c.id}`;
+            const list = state.objectives[k] || [];
+            total += list.length;
+            done += list.filter(o => o.done).length;
+        });
+        const pct = total === 0 ? 0 : Math.round((done/total)*100);
+
+        document.getElementById('currentLabel').innerHTML = `
+            ${d.toLocaleDateString('fr-FR', options)}
+            <span class="stats-sub">${pct}% accompli (${done}/${total})</span>
+        `;
+
+        // Grille
+        const grid = document.getElementById('categoriesGrid');
+        grid.innerHTML = state.categories.map(cat => {
+            const key = `${state.currentPeriod}::${state.currentDate}::${cat.id}`;
+            const objs = state.objectives[key] || [];
+            return `
+                <div class="cat-card">
+                    <div class="cat-header" style="border-top: 4px solid ${cat.color}">
+                        <span>${cat.icon} <b>${cat.name}</b></span>
+                        <button onclick="deleteCat('${cat.id}')" style="background:none; border:none; color:#ddd;">✕</button>
+                    </div>
+                    <div class="objectives-list">
+                        ${objs.map(o => `
+                            <div class="objective-item">
+                                <input type="checkbox" ${o.done ? 'checked' : ''} onchange="toggleObj('${key}', '${o.id}')">
+                                <span class="obj-text ${o.done ? 'done' : ''}">${o.text}</span>
+                                <button class="btn-star" onclick="togglePermanent('${key}', '${o.id}', '${cat.id}')" 
+                                        style="color: ${o.isPermanent ? 'var(--gold)' : '#eee'}">★</button>
+                                <button class="btn-del" onclick="deleteObj('${key}', '${o.id}')">✕</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <input type="text" class="add-obj-input" placeholder="Ajouter une tâche..." 
+                           onkeydown="if(event.key==='Enter') addObjective('${key}', this)">
+                </div>
+            `;
+        }).join('');
+    }
+
+    // --- ACTIONS ---
+    function navigate(dir) {
+        let d = new Date(state.currentDate + "T00:00:00");
+        if (state.currentPeriod === 'Quotidien') d.setDate(d.getDate() + dir);
+        else if (state.currentPeriod === 'Hebdomadaire') d.setDate(d.getDate() + dir * 7);
+        else if (state.currentPeriod === 'Mensuel') d.setMonth(d.getMonth() + dir);
+        state.currentDate = d.toISOString().split('T')[0];
+        render();
+    }
+
+    function addObjective(key, input) {
+        if (!input.value.trim()) return;
+        if (!state.objectives[key]) state.objectives[key] = [];
+        state.objectives[key].push({ id: Date.now().toString(), text: input.value, done: false, isPermanent: false });
+        input.value = '';
+        render();
+    }
+
+    function toggleObj(key, id) {
+        const obj = state.objectives[key].find(o => o.id === id);
+        obj.done = !obj.done;
+        render();
+    }
+
+    function deleteObj(key, id) {
+        state.objectives[key] = state.objectives[key].filter(o => o.id !== id);
+        render();
+    }
+
+    function togglePermanent(key, objId, catId) {
+        const obj = state.objectives[key].find(o => o.id === objId);
+        obj.isPermanent = !obj.isPermanent;
+        if (!state.recurring[catId]) state.recurring[catId] = [];
+        
+        if (obj.isPermanent) state.recurring[catId].push(obj.text);
+        else state.recurring[catId] = state.recurring[catId].filter(t => t !== obj.text);
+        render();
+    }
+
+    // --- RÉGLAGES ---
+    function openSettings() { 
+        document.getElementById('userNameInput').value = state.userName;
+        document.getElementById('settingsModal').classList.add('open'); 
+    }
+    function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+    function saveSettings() {
+        state.userName = document.getElementById('userNameInput').value || "BOSS";
+        closeSettings(); render();
+    }
+    function resetPlanner() {
+        if(confirm("Tout effacer ?")) { localStorage.removeItem('bosslady_final'); location.reload(); }
+    }
+
+    function exportData() {
+        alert("Données actuelles (JSON) :\n\n" + JSON.stringify(state));
+    }
+
+    render();
+</script>
+</body>
+</html>
