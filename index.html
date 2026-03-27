@@ -2,223 +2,162 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>BOSS LADY — Planner</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --cream: #FAF7F2; --warm-white: #FFF9F4; --blush: #E8C4B8;
-            --rose: #C97B6B; --deep-rose: #9B4F41; --gold: #C9A84C;
-            --charcoal: #2A2220; --muted: #8A7A76; --border: #E0D5CF;
+            --cream: #FAF7F2; --rose: #C97B6B; --gold: #C9A84C; --charcoal: #2A2220; --border: #E0D5CF;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); padding-bottom: 100px; }
-
-        header { background: var(--charcoal); padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .logo { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.1rem; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); }
         
-        .period-bar { display: flex; overflow-x: auto; background: var(--warm-white); border-bottom: 1px solid var(--border); }
-        .period-tab { padding: 15px 20px; border: none; background: none; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); cursor: pointer; }
-        .period-tab.active { color: var(--deep-rose); border-bottom: 3px solid var(--rose); }
+        header { background: var(--charcoal); padding: 25px; text-align: center; }
+        .logo { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.5rem; letter-spacing: 1px; }
 
-        .main-content { max-width: 800px; margin: 0 auto; padding: 15px; }
-        .date-nav { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 20px; }
-        .current-label { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; text-align: center; }
+        .nav-tabs { display: flex; justify-content: center; background: white; border-bottom: 1px solid var(--border); }
+        .tab { padding: 15px 20px; border: none; background: none; font-size: 0.8rem; font-weight: 700; color: #888; cursor: pointer; text-transform: uppercase; }
+        .tab.active { color: var(--rose); border-bottom: 2px solid var(--rose); }
 
-        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .cat-card { background: white; border-radius: 15px; border: 1px solid var(--border); overflow: hidden; }
-        .cat-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         
-        .objective-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--cream); gap: 10px; }
-        .obj-text { flex: 1; font-size: 0.95rem; }
-        .obj-text.done { text-decoration: line-through; color: var(--muted); }
+        .date-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; }
 
-        .add-obj-input { width: 100%; padding: 15px; border: none; background: var(--warm-white); font-size: 0.9rem; border-top: 1px solid var(--border); }
-
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; border-radius: 50%; background: var(--charcoal); color: white; border: none; font-size: 28px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; }
-
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; place-items: center; z-index: 1000; backdrop-filter: blur(3px); }
-        .modal-overlay.open { display: grid; }
-        .modal { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 380px; }
-        .btn-action { width: 100%; padding: 12px; background: var(--charcoal); color: white; border: none; border-radius: 8px; margin-top: 10px; cursor: pointer; }
+        .card { background: white; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+        .card-header { padding: 15px; background: #FFF9F4; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 700; }
+        
+        .item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--cream); }
+        .item-text { flex: 1; margin: 0 10px; font-size: 0.95rem; }
+        .item-text.done { text-decoration: line-through; color: #aaa; }
+        
+        .btn-star { background: none; border: none; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .input-area { width: 100%; padding: 15px; border: none; background: #fafafa; font-family: inherit; }
+        
+        button.nav-arrow { background: none; border: none; font-size: 1.5rem; color: var(--rose); cursor: pointer; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo"><span id="displayUserName">BOSS</span>'s Planner ✦</div>
-    <button onclick="openSettings()" style="background:none; border:none; color:white; font-size: 1.2rem;">⚙️</button>
-</header>
+<header><div class="logo">BOSS LADY</div></header>
 
-<div class="period-bar" id="periodBar"></div>
+<div class="nav-tabs" id="tabs"></div>
 
-<div class="main-content">
-    <div class="date-nav">
-        <button onclick="navigate(-1)" style="background:none; border:none; font-size: 2rem; color:var(--muted)">‹</button>
-        <div class="current-label" id="currentLabel"></div>
-        <button onclick="navigate(1)" style="background:none; border:none; font-size: 2rem; color:var(--muted)">›</button>
+<div class="container">
+    <div class="date-display">
+        <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
+        <span id="currentDateLabel"></span>
+        <button class="nav-arrow" onclick="changeDate(1)">›</button>
     </div>
-    <div class="categories-grid" id="categoriesGrid"></div>
-</div>
-
-<button class="fab" onclick="openCatModal()">+</button>
-
-<div class="modal-overlay" id="catModal">
-    <div class="modal">
-        <h3>Nouvelle Catégorie</h3>
-        <input type="text" id="catName" placeholder="Nom (ex: Sport)" style="width:100%; padding:10px; margin: 10px 0; border:1px solid var(--border);">
-        <input type="text" id="catIcon" placeholder="Emoji (ex: 🧘‍♀️)" style="width:100%; padding:10px; margin-bottom: 10px; border:1px solid var(--border);">
-        <button onclick="addCategory()" class="btn-action">Créer</button>
-        <button onclick="closeCatModal()" style="width:100%; background:none; border:none; margin-top:10px; color:var(--muted);">Annuler</button>
-    </div>
-</div>
-
-<div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-        <h3>Paramètres</h3>
-        <input type="text" id="userNameInput" style="width:100%; padding:10px; margin-bottom: 20px; border:1px solid var(--border);">
-        <button onclick="saveSettings()" class="btn-action">Enregistrer</button>
-        <button onclick="resetPlanner()" class="btn-action" style="background:#e74c3c; margin-top: 20px;">Réinitialiser tout</button>
-        <button onclick="closeSettings()" style="width:100%; background:none; border:none; margin-top:10px; color:var(--muted);">Fermer</button>
-    </div>
+    <div id="sections"></div>
 </div>
 
 <script>
-    let state = JSON.parse(localStorage.getItem('bosslady_final')) || {
-        userName: "Lia",
-        currentPeriod: 'Quotidien',
-        currentDate: new Date().toISOString().split('T')[0],
-        categories: [{ id: '1', name: 'Général', icon: '✨', color: '#C97B6B' }],
-        objectives: {},
-        recurring: {}
+    // --- DATA & STATE ---
+    let state = JSON.parse(localStorage.getItem('boss_v1')) || {
+        view: 'Quotidien',
+        date: new Date().toISOString().split('T')[0],
+        categories: [
+            { id: 'c1', name: 'Priorités', icon: '✨' },
+            { id: 'c2', name: 'Bien-être', icon: '🌿' }
+        ],
+        tasks: {},
+        permanentTasks: [] // Liste des textes des tâches récurrentes
     };
 
-    const save = () => localStorage.setItem('bosslady_final', JSON.stringify(state));
+    const save = () => localStorage.setItem('boss_v1', JSON.stringify(state));
 
-    // --- FONCTIONS NAVIGATION ---
-    function navigate(dir) {
-        let d = new Date(state.currentDate + "T00:00:00");
-        if (state.currentPeriod === 'Quotidien') d.setDate(d.getDate() + dir);
-        else if (state.currentPeriod === 'Hebdomadaire') d.setDate(d.getDate() + dir * 7);
-        else if (state.currentPeriod === 'Mensuel') d.setMonth(d.getMonth() + dir);
-        state.currentDate = d.toISOString().split('T')[0];
+    // --- NAVIGATION FIX ---
+    function changeDate(days) {
+        let d = new Date(state.date + "T00:00:00"); // Fix pour iPhone (Midnight UTC)
+        if (state.view === 'Quotidien') d.setDate(d.getDate() + days);
+        else if (state.view === 'Hebdomadaire') d.setDate(d.getDate() + (days * 7));
+        else d.setMonth(d.getMonth() + days);
+        
+        state.date = d.toISOString().split('T')[0];
+        checkPermanent(); // On injecte les tâches permanentes au changement de jour
         render();
     }
 
-    // --- GESTION CATÉGORIES ---
-    function openCatModal() { document.getElementById('catModal').classList.add('open'); }
-    function closeCatModal() { document.getElementById('catModal').classList.remove('open'); }
-    
-    function addCategory() {
-        const name = document.getElementById('catName').value;
-        const icon = document.getElementById('catIcon').value || '📌';
-        if (!name) return;
-        state.categories.push({ id: Date.now().toString(), name, icon, color: '#C97B6B' });
-        document.getElementById('catName').value = '';
-        closeCatModal();
-        render();
-    }
-
-    function deleteCat(id) {
-        if(confirm("Supprimer cette catégorie ?")) {
-            state.categories = state.categories.filter(c => c.id !== id);
-            render();
-        }
-    }
-
-    // --- GESTION TÂCHES ---
-    function addObjective(key, input) {
-        if (!input.value.trim()) return;
-        if (!state.objectives[key]) state.objectives[key] = [];
-        state.objectives[key].push({ id: Date.now().toString(), text: input.value, done: false, isPermanent: false });
-        input.value = '';
-        render();
-    }
-
-    function toggleObj(key, id) {
-        const obj = state.objectives[key].find(o => o.id === id);
-        obj.done = !obj.done;
-        render();
-    }
-
-    function deleteObj(key, id) {
-        state.objectives[key] = state.objectives[key].filter(o => o.id !== id);
-        render();
-    }
-
-    function togglePermanent(key, objId, catId) {
-        const obj = state.objectives[key].find(o => o.id === objId);
-        obj.isPermanent = !obj.isPermanent;
-        if (!state.recurring[catId]) state.recurring[catId] = [];
-        if (obj.isPermanent) state.recurring[catId].push(obj.text);
-        else state.recurring[catId] = state.recurring[catId].filter(t => t !== obj.text);
-        render();
-    }
-
-    // --- RENDU ---
-    function render() {
-        save();
-        // Appliquer récurrence
+    // --- LOGIQUE PERMANENTE ---
+    function checkPermanent() {
         state.categories.forEach(cat => {
-            const key = `${state.currentPeriod}::${state.currentDate}::${cat.id}`;
-            const recList = state.recurring[cat.id] || [];
-            if (!state.objectives[key]) state.objectives[key] = [];
-            recList.forEach(text => {
-                if (!state.objectives[key].some(o => o.text === text)) {
-                    state.objectives[key].push({ id: 'rec_'+Date.now()+Math.random(), text, done: false, isPermanent: true });
+            const key = `${state.view}-${state.date}-${cat.id}`;
+            if (!state.tasks[key]) state.tasks[key] = [];
+            
+            state.permanentTasks.forEach(pTask => {
+                const exists = state.tasks[key].some(t => t.text === pTask.text && t.catId === cat.id);
+                if (exists === false && pTask.catId === cat.id) {
+                    state.tasks[key].push({ text: pTask.text, done: false, star: true });
                 }
             });
         });
+    }
 
-        document.getElementById('displayUserName').textContent = state.userName.toUpperCase();
+    function toggleStar(key, index, catId) {
+        const task = state.tasks[key][index];
+        task.star = !task.star;
+
+        if (task.star) {
+            state.permanentTasks.push({ text: task.text, catId: catId });
+        } else {
+            state.permanentTasks = state.permanentTasks.filter(t => t.text !== task.text || t.catId !== catId);
+        }
+        render();
+    }
+
+    // --- RENDERING ---
+    function render() {
+        save();
         
         // Onglets
-        const periods = ['Quotidien', 'Hebdomadaire', 'Mensuel'];
-        document.getElementById('periodBar').innerHTML = periods.map(p => `
-            <button class="period-tab ${state.currentPeriod === p ? 'active' : ''}" onclick="state.currentPeriod='${p}'; render();">${p}</button>
+        const views = ['Quotidien', 'Hebdomadaire', 'Mensuel'];
+        document.getElementById('tabs').innerHTML = views.map(v => `
+            <button class="tab ${state.view === v ? 'active' : ''}" onclick="state.view='${v}'; render();">${v}</button>
         `).join('');
 
-        // Date
-        const d = new Date(state.currentDate + "T00:00:00");
-        document.getElementById('currentLabel').textContent = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+        // Date Label
+        const options = { day: 'numeric', month: 'long' };
+        document.getElementById('currentDateLabel').innerText = new Date(state.date + "T00:00:00").toLocaleDateString('fr-FR', options);
 
-        // Grille
-        const grid = document.getElementById('categoriesGrid');
-        grid.innerHTML = state.categories.map(cat => {
-            const key = `${state.currentPeriod}::${state.currentDate}::${cat.id}`;
-            const objs = state.objectives[key] || [];
+        // Contenu
+        document.getElementById('sections').innerHTML = state.categories.map(cat => {
+            const key = `${state.view}-${state.date}-${cat.id}`;
+            const tasks = state.tasks[key] || [];
             return `
-                <div class="cat-card">
-                    <div class="cat-header">
-                        <span>${cat.icon} <b>${cat.name}</b></span>
-                        <button onclick="deleteCat('${cat.id}')" style="background:none; border:none; color:#ddd;">✕</button>
-                    </div>
-                    <div class="list">
-                        ${objs.map(o => `
-                            <div class="objective-item">
-                                <input type="checkbox" ${o.done ? 'checked' : ''} onchange="toggleObj('${key}', '${o.id}')">
-                                <span class="obj-text ${o.done ? 'done' : ''}">${o.text}</span>
-                                <button onclick="togglePermanent('${key}', '${o.id}', '${cat.id}')" style="background:none; border:none; color: ${o.isPermanent ? 'var(--gold)' : '#eee'}">★</button>
-                                <button onclick="deleteObj('${key}', '${o.id}')" style="background:none; border:none; color:#eee;">✕</button>
+                <div class="card">
+                    <div class="card-header"><span>${cat.icon} ${cat.name}</span></div>
+                    <div>
+                        ${tasks.map((t, i) => `
+                            <div class="item">
+                                <input type="checkbox" ${t.done ? 'checked' : ''} onclick="toggleTask('${key}', ${i})">
+                                <span class="item-text ${t.done ? 'done' : ''}">${t.text}</span>
+                                <button class="btn-star" onclick="toggleStar('${key}', ${i}, '${cat.id}')">
+                                    ${t.star ? '⭐' : '☆'}
+                                </button>
                             </div>
                         `).join('')}
                     </div>
-                    <input type="text" class="add-obj-input" placeholder="Ajouter..." onkeydown="if(event.key==='Enter') addObjective('${key}', this)">
+                    <input type="text" class="input-area" placeholder="Ajouter..." onkeydown="if(event.key==='Enter') addTask('${key}', this)">
                 </div>
             `;
         }).join('');
     }
 
-    // --- SETTINGS ---
-    function openSettings() { document.getElementById('userNameInput').value = state.userName; document.getElementById('settingsModal').classList.add('open'); }
-    function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
-    function saveSettings() { state.userName = document.getElementById('userNameInput').value || "Lia"; closeSettings(); render(); }
-    function resetPlanner() { if(confirm("Réinitialiser ?")) { localStorage.removeItem('bosslady_final'); location.reload(); } }
+    function addTask(key, input) {
+        if (!input.value) return;
+        if (!state.tasks[key]) state.tasks[key] = [];
+        state.tasks[key].push({ text: input.value, done: false, star: false });
+        input.value = '';
+        render();
+    }
 
+    function toggleTask(key, i) {
+        state.tasks[key][i].done = !state.tasks[key][i].done;
+        render();
+    }
+
+    // Init
+    checkPermanent();
     render();
 </script>
 </body>
